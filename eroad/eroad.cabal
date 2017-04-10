@@ -1,0 +1,53 @@
+name:                eroad
+version:             0.1.0.0
+synopsis:            Web Application Messaging Protocol Library
+description:         Haskell implementation of the Web Application Messaging Protocol.
+                     This library gives the ability to parse the protocol, and produce
+                     messages for the protocol.
+
+                     This library is "sans I/O", it performs no network operation, simply
+                     parses and generate bytes to send through the network library. This
+                     library can be used in combination with the websockets library.
+
+                     The name of this library is a pun with "Autobahn" (the original python
+                     implementation of the protocol) which is a type of e-road. This library
+                     is much more generic than "Autobahn".
+license:             ISC
+license-file:        LICENSE
+-- homepage:
+stability:           alpha
+author:              Antoine Catton
+maintainer:          devel@antoine.catton.fr
+copyright:           (c) 2017 Antoine Catton
+category:            Network
+build-type:          Simple
+extra-source-files:  ChangeLog.md, README.md
+cabal-version:       >=1.10
+
+library
+  exposed-modules:     Network.ERoad
+                     , Network.ERoad.Constants
+                     , Network.ERoad.Internal
+                     , Network.ERoad.Messages
+                     , Network.ERoad.Types
+  other-extensions:    OverloadedStrings
+  build-depends:       base >=4.9 && <4.10
+                     , unordered-containers >=0.2 && <0.3
+                     , text >=1.2 && <1.3
+                     , bytestring >=0.10 && <0.11
+                     , vector >=0.12 && <0.13
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+
+test-suite test-eroad
+  type:                exitcode-stdio-1.0
+  other-extensions:    OverloadedStrings
+  hs-source-dirs:      tests
+  main-is:             Spec.hs
+  build-depends:       eroad
+                     , base >=4.9 && <4.10
+                     , unordered-containers >=0.2 && <0.3
+                     , vector >=0.12 && <0.13
+                     , hspec >=2.4 && <2.5
+  other-modules:       Network.ERoadSpec
+                     , Network.ERoad.MessagesSpec
