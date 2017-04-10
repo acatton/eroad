@@ -14,7 +14,7 @@ description:         Haskell implementation of the Web Application Messaging Pro
                      is much more generic than "Autobahn".
 license:             ISC
 license-file:        LICENSE
--- homepage:
+homepage:            http://github.com/acatton/eroad
 stability:           alpha
 author:              Antoine Catton
 maintainer:          devel@antoine.catton.fr
