@@ -265,19 +265,19 @@ parseEvent elems = errorContext "EVENT message" $ do
 -- <https://tools.ietf.org/html/draft-oberstet-hybi-tavendo-wamp-02#section-6.4.3>
 parseEither :: Value -> Result Message
 parseEither = withMessageType $ \ t ->
-    if      t == C.hello        then parseHello
-    else if t == C.welcome      then parseWelcome
-    else if t == C.abort        then parseAbort
-    else if t == C.goodbye      then parseGoodbye
-    else if t == C.error        then parseError
-    else if t == C.publish      then parsePublish
-    else if t == C.published    then parsePublished
-    else if t == C.subscribe    then parseSubscribe
-    else if t == C.subscribed   then parseSubscribed
-    else if t == C.unsubscribe  then parseUnsubscribe
-    else if t == C.unsubscribed then parseUnsubscribed
-    else if t == C.event        then parseEvent
-    else const $ Left "Invalid message type"
+    case t of _ | t == C.hello        -> parseHello
+                | t == C.welcome      -> parseWelcome
+                | t == C.abort        -> parseAbort
+                | t == C.goodbye      -> parseGoodbye
+                | t == C.error        -> parseError
+                | t == C.publish      -> parsePublish
+                | t == C.published    -> parsePublished
+                | t == C.subscribe    -> parseSubscribe
+                | t == C.subscribed   -> parseSubscribed
+                | t == C.unsubscribe  -> parseUnsubscribe
+                | t == C.unsubscribed -> parseUnsubscribed
+                | t == C.event        -> parseEvent
+                | otherwise           -> const $ Left "Invalid message type"
 
 
 uriToString :: URI -> Value
