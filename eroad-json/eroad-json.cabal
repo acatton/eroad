@@ -1,0 +1,44 @@
+name:                eroad-json
+version:             0.1.0.0
+synopsis:            ERoad adapter for JSON
+description:         WAMP protocol supports multiple serialization of messages.
+                     One of them is JSON. This protocol implements the
+                     serialization/deserilization of WAMP messages in JSON with
+                     the ERoad library.
+homepage:            https://github.com/acatton/eroad#readme
+license:             ISC
+license-file:        LICENSE
+author:              Antoine Catton
+maintainer:          devel@antoine.catton.fr
+copyright:           2017 Antoine Catton
+category:            Network
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >=1.10
+
+library
+  exposed-modules:     Network.ERoad.JSON
+  build-depends:       base >=4.9 && <4.10
+                     , eroad >=0.1 && <0.2
+                     , aeson >=1.1 && <1.2
+                     , scientific >=0.3 && <0.4
+                     , vector
+                     , unordered-containers
+                     , hashable
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+
+
+test-suite test-eroad-json
+  type:                exitcode-stdio-1.0
+  other-extensions:    OverloadedStrings
+  hs-source-dirs:      tests
+  main-is:             Spec.hs
+  build-depends:       eroad
+                     , eroad-json
+                     , base >=4.9 && <4.10
+                     , aeson
+                     , unordered-containers
+                     , hspec >= 2.4 && <2.5
+  other-modules:       Network.ERoad.JSONSpec
+  default-language:    Haskell2010

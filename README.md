@@ -7,3 +7,4 @@ Autobahn library or the protocol design.
 The libraries are:
 
   * [eroad](./eroad): Generic low-level library to serialize/deserialize WAMP messages
+  * [eroad-json](./eroad-json): JSON serialization/deserilization of WAMP messages
