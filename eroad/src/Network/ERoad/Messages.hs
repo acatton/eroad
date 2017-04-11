@@ -17,6 +17,11 @@ type Result a = Either String a
 type Parser = Value -> Result Message
 
 
+idToValue :: ID -> Value
+{-# INLINE idToValue #-}
+idToValue = Integer . idToNonNegativeInteger
+
+
 withList :: String -> (List -> Result Message) -> Parser
 withList _ f (List l) = f l
 withList e _ _        = Left e
@@ -103,7 +108,9 @@ castURI e _            = Left e
 
 
 castID :: String -> Value -> Result ID
-castID _ (Integer i) = return i -- TODO: Check ID
+castID e (Integer i) = case idFromNonNegativeInteger i  of
+                           Just i' -> return i'
+                           Nothing -> Left e
 castID e _           = Left e
 
 
@@ -301,7 +308,7 @@ serialize Hello{realm, details} =
         where URI realm' = realm
 
 serialize Welcome{session, details} =
-    List [ Integer C.welcome, Integer session, Dict details ]
+    List [ Integer C.welcome, idToValue session, Dict details ]
 
 serialize Abort{details, reason} =
     List [ Integer C.abort, Dict details, uriToString reason ]
@@ -310,28 +317,28 @@ serialize Goodbye{details, reason} =
     List [ Integer C.goodbye, Dict details, uriToString reason ]
 
 serialize Error{type_,request,details,error_,args,kwargs} =
-    List $ addArgsKwargs [ Integer C.error, Integer type_, Integer request
+    List $ addArgsKwargs [ Integer C.error, Integer type_, idToValue request
                          , Dict details, uriToString error_ ] args kwargs
 
 serialize Publish{request,options,topic,args,kwargs} =
-    List $ addArgsKwargs [ Integer C.publish, Integer request, Dict options
+    List $ addArgsKwargs [ Integer C.publish, idToValue request, Dict options
                          , uriToString topic ] args kwargs
 
 serialize Published{request,publication} =
-    List [ Integer C.published, Integer request, Integer publication ]
+    List [ Integer C.published, idToValue request, idToValue publication ]
 
 serialize Subscribe{request,options,topic} =
-    List [ Integer C.subscribe, Integer request, Dict options, uriToString topic ]
+    List [ Integer C.subscribe, idToValue request, Dict options, uriToString topic ]
 
 serialize Subscribed{request,subscription} =
-    List [ Integer C.subscribed, Integer request, Integer subscription ]
+    List [ Integer C.subscribed, idToValue request, idToValue subscription ]
 
 serialize Unsubscribe{request,subscription} =
-    List [ Integer C.unsubscribe, Integer request, Integer subscription ]
+    List [ Integer C.unsubscribe, idToValue request, idToValue subscription ]
 
 serialize Unsubscribed{request} =
-    List [ Integer C.unsubscribed, Integer request ]
+    List [ Integer C.unsubscribed, idToValue request ]
 
 serialize Event{subscription,publication,details,args,kwargs} =
-    List $ addArgsKwargs [ Integer C.event, Integer subscription, Integer publication
-                         , Dict details ] args kwargs
+    List $ addArgsKwargs [ Integer C.event, idToValue subscription
+                         , idToValue publication, Dict details ] args kwargs

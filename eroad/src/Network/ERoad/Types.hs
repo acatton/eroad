@@ -2,6 +2,9 @@
 
 module Network.ERoad.Types ( URI(..)
                            , ID
+                           , idFromNonNegativeInteger
+                           , idToNonNegativeInteger
+                           , idToInteger
                            , NonNegativeInteger
                            , nonNegativeInteger
                            , nonNegativeToInteger
@@ -14,12 +17,14 @@ module Network.ERoad.Types ( URI(..)
 import Data.HashMap.Strict (HashMap)
 import Data.Text           (Text, intercalate)
 import Data.Vector         (Vector)
+import Data.Maybe          (fromJust)
 
 
 data URI = URI Text
                deriving (Show, Eq)
 
-type ID = NonNegativeInteger -- TODO: Fix type
+data ID = ID NonNegativeInteger
+              deriving (Show, Eq, Ord)
 
 data NonNegativeInteger = NonNegativeInteger Integer
                               deriving (Show, Eq, Ord)
@@ -33,6 +38,25 @@ nonNegativeInteger i | i < 0     = Nothing
 
 nonNegativeToInteger :: NonNegativeInteger -> Integer
 nonNegativeToInteger (NonNegativeInteger i) = i
+
+
+idToNonNegativeInteger :: ID -> NonNegativeInteger
+idToNonNegativeInteger (ID i) = i
+
+
+idToInteger :: ID -> Integer
+idToInteger = nonNegativeToInteger . idToNonNegativeInteger
+
+
+maxID :: Integer
+maxID = 2^53
+
+
+idFromNonNegativeInteger :: NonNegativeInteger -> Maybe ID
+idFromNonNegativeInteger i =
+    if i' > maxID then Nothing
+                  else Just $ ID i
+        where i' = nonNegativeToInteger i
 
 
 data Value = Integer !NonNegativeInteger

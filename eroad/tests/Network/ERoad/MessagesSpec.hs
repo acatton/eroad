@@ -27,6 +27,11 @@ integer' :: Integer -> Value
 integer' = Integer . nni
 
 
+id' :: Integer -> ID
+{-# INLINE id' #-}
+id' = fromJust . idFromNonNegativeInteger . nni
+
+
 spec :: Spec
 spec = do
     describe "parse" $ do
@@ -54,9 +59,11 @@ spec = do
         describe "WELCOME" $ do
             it "Parses simple message" $ do
                 parse' [ Integer C.welcome, integer' 0, Dict M.empty ]
-                    `shouldBe` Just Welcome { session = nni 0, details = M.empty }
+                    `shouldBe` Just Welcome { session = id' 0, details = M.empty }
 
-            it "Refuses invalid ID" $ pending
+            it "Refuses invalid ID" $
+                parse' [ Integer C.welcome, integer' $ 2^64, Dict M.empty ]
+                    `shouldBe` Nothing
 
         describe "ABORT" $ do
             it "Parses simple message" $ do
@@ -82,7 +89,7 @@ spec = do
                 parse' [ Integer C.error, integer' 0, integer' 1337
                        , Dict M.empty, String "com.example.error" ]
                     `shouldBe` Just Error { type_   = nni 0
-                                          , request = nni 1337
+                                          , request = id' 1337
                                           , details = M.empty
                                           , error_  = URI "com.example.error"
                                           , args    = []
@@ -94,7 +101,7 @@ spec = do
                        , Dict M.empty, String "com.example.error"
                        , List [String "a"], Dict nonEmptyDict ]
                     `shouldBe` Just Error { type_   = nni 0
-                                          , request = nni 1337
+                                          , request = id' 1337
                                           , details = M.empty
                                           , error_  = URI "com.example.error"
                                           , args    = [String "a"]
@@ -112,7 +119,7 @@ spec = do
             it "Parses simple messages" $
                 parse' [ Integer C.publish, integer' 0, Dict M.empty
                        , String "com.example.topic" ]
-                    `shouldBe` Just Publish { request = nni 0
+                    `shouldBe` Just Publish { request = id' 0
                                             , options = M.empty
                                             , topic   = URI "com.example.topic"
                                             , args    = []
@@ -123,8 +130,8 @@ spec = do
         describe "PUBLISHED" $ do
             it "Parses simple messages" $
                 parse' [ Integer C.published, integer' 0, integer' 0 ]
-                    `shouldBe` Just Published { request     = nni 0
-                                              , publication = nni 0
+                    `shouldBe` Just Published { request     = id' 0
+                                              , publication = id' 0
                                               }
 
 
@@ -132,7 +139,7 @@ spec = do
             it "Parses simple messages" $
                 parse' [ Integer C.subscribe, integer' 0, Dict M.empty
                        , String "com.example.topic" ]
-                    `shouldBe` Just Subscribe { request = nni 0
+                    `shouldBe` Just Subscribe { request = id' 0
                                               , options = M.empty
                                               , topic   = URI "com.example.topic"
                                               }
@@ -140,28 +147,28 @@ spec = do
         describe "SUBSCRIBED" $ do
             it "Parses simple messages" $
                 parse' [ Integer C.subscribed, integer' 0, integer' 1337 ]
-                    `shouldBe` Just Subscribed { request      = nni 0
-                                               , subscription = nni 1337
+                    `shouldBe` Just Subscribed { request      = id' 0
+                                               , subscription = id' 1337
                                                }
 
         describe "UNSUBSCRIBE" $ do
             it "Parses simple messages" $
                 parse' [ Integer C.unsubscribe, integer' 0, integer' 1337 ]
-                    `shouldBe` Just Unsubscribe { request      = nni 0
-                                                , subscription = nni 1337
+                    `shouldBe` Just Unsubscribe { request      = id' 0
+                                                , subscription = id' 1337
                                                 }
 
         describe "UNSUBSCRIBED" $ do
             it "Parses simple messages" $
                 parse' [ Integer C.unsubscribed, integer' 0 ]
-                    `shouldBe` Just Unsubscribed { request = nni 0 }
+                    `shouldBe` Just Unsubscribed { request = id' 0 }
 
         describe "EVENT" $ do
             it "Parses simple messages" $
                 parse' [ Integer C.event, integer' 0, integer' 1337
                        , Dict nonEmptyDict ]
-                    `shouldBe` Just Event { subscription = nni 0
-                                          , publication  = nni 1337
+                    `shouldBe` Just Event { subscription = id' 0
+                                          , publication  = id' 1337
                                           , details      = nonEmptyDict
                                           , args         = []
                                           , kwargs       = M.empty
@@ -169,14 +176,14 @@ spec = do
 
     describe "serialize" $ do
         it "Never sends empty args & kwargs" $
-            serialize Error { type_ = nni 0, request = nni 1337, details = nonEmptyDict
+            serialize Error { type_ = nni 0, request = id' 1337, details = nonEmptyDict
                             , error_ = URI "com.example.error", args = []
                             , kwargs = M.empty }
                 `shouldBe` List [ Integer C.error, integer' 0, integer' 1337
                                 , Dict nonEmptyDict, String "com.example.error" ]
 
         it "Serialize args when they're not empty" $
-            serialize Error { type_ = nni 0, request = nni 1337, details = nonEmptyDict
+            serialize Error { type_ = nni 0, request = id' 1337, details = nonEmptyDict
                             , error_ = URI "com.example.error", args = [integer' 1]
                             , kwargs = M.empty }
                 `shouldBe` List [ Integer C.error, integer' 0, integer' 1337
@@ -184,7 +191,7 @@ spec = do
                                 , List [integer' 1] ]
 
         it "Don't miss args when sending kwargs" $
-            serialize Error { type_ = nni 0, request = nni 1337, details = M.empty
+            serialize Error { type_ = nni 0, request = id' 1337, details = M.empty
                             , error_ = URI "com.example.error", args = []
                             , kwargs = nonEmptyDict }
                 `shouldBe` List [ Integer C.error, integer' 0, integer' 1337
@@ -192,7 +199,7 @@ spec = do
                                 , List [], Dict nonEmptyDict ]
 
         it "Sends args and kwargs" $
-            serialize Error { type_ = nni 0, request = nni 1337, details = M.empty
+            serialize Error { type_ = nni 0, request = id' 1337, details = M.empty
                             , error_ = URI "com.example.error", args = [integer' 1]
                             , kwargs = nonEmptyDict }
                 `shouldBe` List [ Integer C.error, integer' 0, integer' 1337
