@@ -3,6 +3,8 @@
 module Network.ERoad.Types ( URI(..)
                            , ID
                            , NonNegativeInteger
+                           , nonNegativeInteger
+                           , nonNegativeToInteger
                            , Value(..)
                            , List
                            , Dict
@@ -19,7 +21,19 @@ data URI = URI Text
 
 type ID = NonNegativeInteger -- TODO: Fix type
 
-type NonNegativeInteger = Int -- TODO: Fix type
+data NonNegativeInteger = NonNegativeInteger Integer
+                              deriving (Show, Eq, Ord)
+
+
+
+nonNegativeInteger :: Integer -> Maybe NonNegativeInteger
+nonNegativeInteger i | i < 0     = Nothing
+                     | otherwise = Just $ NonNegativeInteger i
+
+
+nonNegativeToInteger :: NonNegativeInteger -> Integer
+nonNegativeToInteger (NonNegativeInteger i) = i
+
 
 data Value = Integer !NonNegativeInteger
            | String  !Text

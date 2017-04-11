@@ -21,64 +21,69 @@ module Network.ERoad.Constants ( abort
                                ) where
 
 import Prelude hiding (error)
-import Network.ERoad.Types (NonNegativeInteger)
+import Network.ERoad.Types (NonNegativeInteger, nonNegativeInteger)
+import Data.Maybe (fromJust)
+
+nni :: Integer -> NonNegativeInteger
+{-# INLINE nni #-}
+nni = fromJust . nonNegativeInteger
 
 hello :: NonNegativeInteger
-hello = 1
+hello = nni 1
 
 welcome :: NonNegativeInteger
-welcome = 2
+welcome = nni 2
 
 abort :: NonNegativeInteger
-abort = 3
+abort = nni 3
 
 goodbye :: NonNegativeInteger
-goodbye = 6
+goodbye = nni 6
 
 error :: NonNegativeInteger
-error = 8
+error = nni 8
 
 publish :: NonNegativeInteger
-publish = 16
+publish = nni 16
 
 published :: NonNegativeInteger
-published = 17
+published = nni 17
 
 subscribe :: NonNegativeInteger
-subscribe = 32
+subscribe = nni 32
 
 subscribed :: NonNegativeInteger
-subscribed = 33
+subscribed = nni 33
 
 unsubscribe :: NonNegativeInteger
-unsubscribe = 34
+unsubscribe = nni 34
 
 unsubscribed :: NonNegativeInteger
-unsubscribed = 35
+unsubscribed = nni 35
 
 event :: NonNegativeInteger
-event = 36
+event = nni 36
 
 call :: NonNegativeInteger
-call = 48
+call = nni 48
 
 result :: NonNegativeInteger
-result = 50
+result = nni 50
 
 register :: NonNegativeInteger
-register = 64
+register = nni 64
 
 registered :: NonNegativeInteger
-registered = 65
+registered = nni 65
 
 unregister :: NonNegativeInteger
-unregister = 66
+unregister = nni 66
 
 unregistered :: NonNegativeInteger
-unregistered = 67
+unregistered = nni 67
 
 invocation :: NonNegativeInteger
-invocation = 68
+invocation = nni 68
 
 yield :: NonNegativeInteger
-yield = 70
+yield = nni 70
