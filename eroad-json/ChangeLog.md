@@ -5,3 +5,4 @@
 Initial version
 
 * Serialize eroad values to JSON
+* Deserialize eroad values from JSON
